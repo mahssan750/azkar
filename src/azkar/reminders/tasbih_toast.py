@@ -8,6 +8,7 @@ from __future__ import annotations
 from ..config import Settings
 from ..content.json_provider import JsonContentProvider
 from ..notifier import Notifier
+from ..sound import play_knock
 from .base import Reminder
 
 TOAST_TITLE = "تذكير"
@@ -26,4 +27,7 @@ class TasbihToastReminder(Reminder):
             text = self._provider.next() or self._settings.tasbih_text
         else:
             text = self._settings.tasbih_text
-        self._notifier.notify(TOAST_TITLE, text)
+        sound = self._settings.reminder_sound_enabled
+        if sound:
+            play_knock()
+        self._notifier.notify(TOAST_TITLE, text, silent=sound)

@@ -42,12 +42,14 @@ class AzkarApp:
                 "open_window": self.open_window,
                 "remind_now": self.remind_now,
                 "set_paused": self.set_paused,
+                "set_sound": self.set_sound,
                 "show_startup": self.show_startup,
                 "set_autostart": self.set_autostart,
                 "quit": self.quit,
             },
             paused=False,
             autostart=autostart.is_enabled(),
+            sound=self.settings.reminder_sound_enabled,
         )
         self.tray.show()
 
@@ -84,6 +86,10 @@ class AzkarApp:
             self.scheduler.pause()
         else:
             self.scheduler.resume()
+
+    def set_sound(self, enabled: bool) -> None:
+        self.settings.reminder_sound_enabled = enabled
+        save_settings(self.settings)
 
     def show_startup(self) -> None:
         show_startup_dialog(self.icon)

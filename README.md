@@ -5,7 +5,7 @@ computer.
 
 - **At login** it shows a dialog:
   > لا تنسى أن تقول بسم الله ولا تنسى أن تحضر النية لهذا العمل
-- **Every 10 minutes** it shows a native Windows toast:
+- **Every 10 minutes** it shows a native Windows toast (with a knock-knock sound):
   > قل سبحان الله والحمد لله
 - **A modern tabbed main window** (opens on launch; double-click the tray icon
   to reopen it):
@@ -67,6 +67,7 @@ Edit `%APPDATA%\Azkar\config.json` (created on first run):
 | `reminder_interval_minutes` | `10` | Minutes between toasts |
 | `startup_dialog_enabled` | `true` | Show the login dialog |
 | `tasbih_reminder_enabled` | `true` | Enable the recurring toast |
+| `reminder_sound_enabled` | `true` | Play the knock-knock sound with each reminder |
 | `run_at_login` | `true` | Launch automatically at sign-in |
 | `tasbih_text` | `"قل سبحان الله والحمد لله"` | The toast text |
 | `tasbih_shuffle` | `false` | Rotate phrases from `tasbih.json` instead |

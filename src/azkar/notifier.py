@@ -28,17 +28,25 @@ class Notifier:
         except Exception:
             self._toaster = None
 
-    def notify(self, title: str, body: str) -> None:
-        if self._toaster is not None and self._show_native(title, body):
+    def notify(self, title: str, body: str, *, silent: bool = False) -> None:
+        if self._toaster is not None and self._show_native(title, body, silent):
             return
         self._show_tray(title, body)
 
-    def _show_native(self, title: str, body: str) -> bool:
+    def _show_native(self, title: str, body: str, silent: bool = False) -> bool:
         try:
             from windows_toasts import Toast, ToastDisplayImage, ToastImagePosition
 
             toast = Toast()
             toast.text_fields = [title, body] if title else [body]
+            if silent:
+                # mute the default toast chime so only our knock sound plays
+                try:
+                    from windows_toasts import ToastAudio
+
+                    toast.audio = ToastAudio(silent=True)
+                except Exception:
+                    pass
             if self._icon_path:
                 try:
                     toast.AddImage(

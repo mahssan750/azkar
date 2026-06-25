@@ -12,9 +12,12 @@ $entry  = Join-Path $root "launcher.py"
 
 Push-Location $root
 try {
-    # Generate the .ico if it is missing (best-effort).
+    # Generate the .ico / sound if missing (best-effort).
     if (-not (Test-Path $icon)) {
         & $python (Join-Path $root "scripts\make_icon.py")
+    }
+    if (-not (Test-Path (Join-Path $root "assets\sounds\knock.wav"))) {
+        & $python (Join-Path $root "scripts\make_sound.py")
     }
 
     $pyArgs = @(

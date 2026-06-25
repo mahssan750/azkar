@@ -21,6 +21,7 @@ class TrayIcon(QSystemTrayIcon):
         *,
         paused: bool,
         autostart: bool,
+        sound: bool = True,
         parent=None,
     ):
         super().__init__(icon, parent)
@@ -44,6 +45,12 @@ class TrayIcon(QSystemTrayIcon):
         self._pause_action.setChecked(paused)
         self._pause_action.toggled.connect(self._on_pause_toggled)
         menu.addAction(self._pause_action)
+
+        self._sound_action = QAction("صوت التذكير", menu)
+        self._sound_action.setCheckable(True)
+        self._sound_action.setChecked(sound)
+        self._sound_action.toggled.connect(callbacks["set_sound"])
+        menu.addAction(self._sound_action)
 
         show_startup = QAction("إظهار رسالة البداية", menu)
         show_startup.triggered.connect(callbacks["show_startup"])

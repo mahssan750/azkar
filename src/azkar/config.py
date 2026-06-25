@@ -22,6 +22,7 @@ class Settings:
     reminder_interval_minutes: int = 10
     startup_dialog_enabled: bool = True
     tasbih_reminder_enabled: bool = True
+    reminder_sound_enabled: bool = True
     run_at_login: bool = True
 
     # The 10-minute reminder text. By default it is the fixed phrase above.
