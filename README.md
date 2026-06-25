@@ -7,12 +7,17 @@ computer.
   > لا تنسى أن تقول بسم الله ولا تنسى أن تحضر النية لهذا العمل
 - **Every 10 minutes** it shows a native Windows toast:
   > قل سبحان الله والحمد لله
-- **A modern main window** where you can add your own azkar and see them as cards.
+- **A modern tabbed main window** (opens on launch; double-click the tray icon
+  to reopen it):
+  - **أذكار الصباح** — morning azkar with tap counters and "done" checkboxes.
+  - **أذكار المساء** — evening azkar, same.
+  - **الأربعون النووية** — the 40 (42) hadith of an-Nawawi, each with an
+    expandable explanation.
+  - **أذكاري** — add and keep your own azkar.
+- A du'a footer on every tab: *لا تنسونا من صالح دعائكم*.
 
-It runs quietly in the system tray (double-click the tray icon to open the
-window) and is built to grow — adding a hadith shuffler across books or the
-Qur'an means adding a new *reminder* and a JSON *content* file, not rewriting
-the core.
+It runs quietly in the system tray and is built to grow — content lives in
+JSON files under `content/data/`, so adding more is data, not code.
 
 ## Download (Windows) — easiest
 
@@ -97,16 +102,24 @@ src/azkar/
   scheduler.py      QTimer-based, holds many reminders
   notifier.py       native toasts (windows-toasts) + tray fallback
   reminders/        startup_dialog.py, tasbih_toast.py  (+ base.py)
-  content/          JSON provider + data/ (tasbih, azkar, hadith)
-  ui/               rtl.py, widgets.py, icon.py
+  content/          JSON provider, dataset loader, user store + data/
+  ui/               main_window.py, pages.py, cards.py, rtl.py, widgets.py, icon.py
 ```
 
 ### Adding a feature later
 
+- **A new tab:** build a page in `ui/pages.py` (reuse the card widgets in
+  `ui/cards.py`) and `addTab(...)` it in `ui/main_window.py`.
 - **A new recurring reminder:** subclass `reminders/base.Reminder`, then
   `scheduler.add_interval_reminder(name, interval_ms, reminder.run)` in `app.py`.
-- **A new pop-up window (azkar/hadith/Qur'an):** reuse
-  `ui/widgets.ArabicMessageDialog` (or subclass it) and feed it from a
-  `JsonContentProvider("yourfile.json")`.
-- **New content:** drop a JSON file in `content/data/` (a list of strings, or
-  objects with a `"text"` key).
+- **New content:** drop a JSON file in `content/data/` and load it with
+  `content.dataset.load_dataset("yourfile.json")`.
+
+## Content credits
+
+Islamic texts are public domain; the JSON was normalised from open datasets —
+see [src/azkar/content/data/SOURCES.md](src/azkar/content/data/SOURCES.md).
+
+## License
+
+[MIT](LICENSE) © 2026 mahssan750

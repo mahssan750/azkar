@@ -63,7 +63,10 @@ class AzkarApp:
         # Honour the saved "run at login" preference.
         autostart.sync(self.settings.run_at_login)
 
-        # Show the login dialog once the tray has settled.
+        # Open the main window on launch (double-clicking Azkar.exe shows it).
+        self.open_window()
+
+        # Show the login reminder once the tray has settled.
         if self.settings.startup_dialog_enabled:
             QTimer.singleShot(400, self.show_startup)
 
