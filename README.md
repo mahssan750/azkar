@@ -53,22 +53,31 @@ py -m venv .venv
 .\.venv\Scripts\python.exe -m azkar
 ```
 
-The startup dialog appears, a tray icon shows up, and a toast fires on the
-configured interval. Right-click the tray icon for: تذكير الآن (remind now),
-إيقاف/استئناف التذكير (pause/resume), إظهار رسالة البداية (show startup dialog),
-بدء التشغيل مع ويندوز (start with Windows), خروج (quit).
+A tray icon shows up and the main window opens. The startup reminder dialog only
+appears when the app is launched **at login** (not on a manual open). Right-click
+the tray icon for: إظهار النافذة الرئيسية (open window), الإعدادات (settings),
+تذكير الآن (remind now), إيقاف/استئناف التذكير (pause/resume), صوت التذكير (sound),
+إظهار رسالة البداية, بدء التشغيل مع ويندوز (start with Windows), خروج (quit).
 
 ## Settings
 
-Edit `%APPDATA%\Azkar\config.json` (created on first run):
+Open **الإعدادات** from the tray menu or the ⚙ gear in the window to change:
+
+- **Theme** — light or dark.
+- **Font size** — bigger / smaller (A+ / A−).
+- **Reminder** — enable/disable, interval in minutes, the reminder text, and sound.
+
+Everything is also stored in `%APPDATA%\Azkar\config.json` (created on first run):
 
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `reminder_interval_minutes` | `10` | Minutes between toasts |
-| `startup_dialog_enabled` | `true` | Show the login dialog |
+| `startup_dialog_enabled` | `true` | Show the login dialog (login launches only) |
 | `tasbih_reminder_enabled` | `true` | Enable the recurring toast |
 | `reminder_sound_enabled` | `true` | Play the knock-knock sound with each reminder |
 | `run_at_login` | `true` | Launch automatically at sign-in |
+| `theme` | `"light"` | `"light"` or `"dark"` |
+| `font_scale` | `1.0` | UI font scale (0.7–1.6) |
 | `tasbih_text` | `"قل سبحان الله والحمد لله"` | The toast text |
 | `tasbih_shuffle` | `false` | Rotate phrases from `tasbih.json` instead |
 | `debug_interval_seconds` | `0` | If > 0, overrides the interval (for testing) |

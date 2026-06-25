@@ -34,6 +34,10 @@ class TrayIcon(QSystemTrayIcon):
         open_window.triggered.connect(callbacks["open_window"])
         menu.addAction(open_window)
 
+        settings = QAction("الإعدادات", menu)
+        settings.triggered.connect(callbacks["open_settings"])
+        menu.addAction(settings)
+
         menu.addSeparator()
 
         remind_now = QAction("تذكير الآن", menu)
@@ -72,6 +76,11 @@ class TrayIcon(QSystemTrayIcon):
 
         self.setContextMenu(menu)
         self.activated.connect(self._on_activated)
+
+    def set_sound_checked(self, checked: bool) -> None:
+        self._sound_action.blockSignals(True)
+        self._sound_action.setChecked(checked)
+        self._sound_action.blockSignals(False)
 
     def _on_pause_toggled(self, checked: bool) -> None:
         self._pause_action.setText("استئناف التذكير" if checked else "إيقاف التذكير")

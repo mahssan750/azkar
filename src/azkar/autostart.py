@@ -15,18 +15,23 @@ RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 VALUE_NAME = APP_NAME  # "Azkar"
 
 
+# Passed when launched at login, so the app knows to show the startup reminder
+# (a manual launch omits it and shows the main window instead).
+STARTUP_FLAG = "--startup"
+
+
 def _command() -> str:
     """The command line Windows should execute at login (quoted)."""
     if paths.is_frozen():
-        return f'"{Path(sys.executable)}"'
+        return f'"{Path(sys.executable)}" {STARTUP_FLAG}'
     # dev: prefer the windowed launcher created by `pip install -e .`
     scripts_dir = Path(sys.executable).parent  # e.g. .venv\Scripts
     launcher = scripts_dir / "azkar.exe"
     if launcher.exists():
-        return f'"{launcher}"'
+        return f'"{launcher}" {STARTUP_FLAG}'
     pythonw = Path(sys.executable).with_name("pythonw.exe")
     runner = pythonw if pythonw.exists() else Path(sys.executable)
-    return f'"{runner}" -m azkar'
+    return f'"{runner}" -m azkar {STARTUP_FLAG}'
 
 
 def enable() -> None:

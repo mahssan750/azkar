@@ -25,6 +25,10 @@ class Settings:
     reminder_sound_enabled: bool = True
     run_at_login: bool = True
 
+    # appearance
+    theme: str = "light"          # "light" or "dark"
+    font_scale: float = 1.0       # 0.7 .. 1.6
+
     # The 10-minute reminder text. By default it is the fixed phrase above.
     tasbih_text: str = DEFAULT_TASBIH_TEXT
     # When True, the reminder rotates through content/data/tasbih.json instead

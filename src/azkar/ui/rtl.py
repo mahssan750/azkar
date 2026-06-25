@@ -22,6 +22,16 @@ SYSTEM_FONT_CANDIDATES = [
 ]
 
 _family: str | None = None
+_scale: float = 1.0
+
+
+def set_font_scale(scale: float) -> None:
+    global _scale
+    _scale = max(0.6, min(2.0, float(scale)))
+
+
+def font_scale() -> float:
+    return _scale
 
 
 def load_arabic_font() -> str:
@@ -57,6 +67,6 @@ def apply_rtl(app: QApplication) -> None:
 
 
 def arabic_font(point_size: int, *, bold: bool = False) -> QFont:
-    f = QFont(load_arabic_font(), point_size)
+    f = QFont(load_arabic_font(), max(1, round(point_size * _scale)))
     f.setBold(bold)
     return f

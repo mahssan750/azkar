@@ -1,16 +1,18 @@
 """Application entry point: wires the tray, scheduler, and reminders together.
 
-The app has no main window — it lives in the system tray. On launch it shows
-the startup dialog and begins the recurring tasbih toast.
+The app lives in the system tray. A manual launch opens the main window; a login
+launch (``--startup``) shows the startup reminder dialog instead. The recurring
+tasbih toast runs in the background either way.
 """
 from __future__ import annotations
 
 import sys
 
 from PySide6.QtCore import QSharedMemory, QTimer
-from PySide6.QtWidgets import QApplication, QMessageBox, QSystemTrayIcon
+from PySide6.QtWidgets import QApplication, QDialog, QMessageBox, QSystemTrayIcon
 
 from . import APP_DISPLAY_NAME, APP_ID, APP_NAME, autostart
+from .autostart import STARTUP_FLAG
 from .config import load_settings, save_settings
 from .notifier import Notifier
 from .paths import icon_png_path
@@ -18,16 +20,22 @@ from .reminders.startup_dialog import show_startup_dialog
 from .reminders.tasbih_toast import TasbihToastReminder
 from .scheduler import ReminderScheduler
 from .tray import TrayIcon
+from .ui import rtl, theme
 from .ui.icon import make_icon, save_png
 from .ui.main_window import MainWindow
 from .ui.rtl import apply_rtl
+from .ui.settings_dialog import SettingsDialog
 
 
 class AzkarApp:
-    def __init__(self, app: QApplication):
+    def __init__(self, app: QApplication, *, startup: bool = False):
         self.app = app
         self.settings = load_settings()
         self.window: MainWindow | None = None
+
+        # appearance must be set before any window is built
+        theme.set_theme(self.settings.theme)
+        rtl.set_font_scale(self.settings.font_scale)
 
         self.icon = make_icon()
         app.setWindowIcon(self.icon)
@@ -40,6 +48,7 @@ class AzkarApp:
             APP_DISPLAY_NAME,
             callbacks={
                 "open_window": self.open_window,
+                "open_settings": self.open_settings,
                 "remind_now": self.remind_now,
                 "set_paused": self.set_paused,
                 "set_sound": self.set_sound,
@@ -57,26 +66,53 @@ class AzkarApp:
 
         self.scheduler = ReminderScheduler()
         self.tasbih = TasbihToastReminder(self.notifier, self.settings)
-        if self.settings.tasbih_reminder_enabled:
-            self.scheduler.add_interval_reminder(
-                self.tasbih.name, self.settings.interval_ms, self.tasbih.run
-            )
+        self.scheduler.add_interval_reminder(
+            self.tasbih.name,
+            self.settings.interval_ms,
+            self.tasbih.run,
+            enabled=self.settings.tasbih_reminder_enabled,
+        )
 
         # Honour the saved "run at login" preference.
         autostart.sync(self.settings.run_at_login)
 
-        # Open the main window on launch (double-clicking Azkar.exe shows it).
-        self.open_window()
-
-        # Show the login reminder once the tray has settled.
-        if self.settings.startup_dialog_enabled:
-            QTimer.singleShot(400, self.show_startup)
+        if startup:
+            # Launched at login: show only the startup reminder; stay in the tray.
+            if self.settings.startup_dialog_enabled:
+                QTimer.singleShot(400, self.show_startup)
+        else:
+            # Launched manually (double-click): open the main window, no dialog.
+            self.open_window()
 
     # --- tray callbacks ---------------------------------------------------
     def open_window(self) -> None:
         if self.window is None:
-            self.window = MainWindow(self.icon)
+            self.window = MainWindow(self.icon, on_settings=self.open_settings)
         self.window.reveal()
+
+    def open_settings(self) -> None:
+        dialog = SettingsDialog(self.settings, icon=self.icon)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            self._apply_settings(dialog.get_values())
+
+    def _apply_settings(self, values: dict) -> None:
+        s = self.settings
+        s.theme = values["theme"]
+        s.font_scale = values["font_scale"]
+        s.tasbih_reminder_enabled = values["reminder_enabled"]
+        s.reminder_interval_minutes = values["interval_minutes"]
+        s.tasbih_text = values["reminder_text"]
+        s.reminder_sound_enabled = values["sound_enabled"]
+        save_settings(s)
+
+        # apply live
+        theme.set_theme(s.theme)
+        rtl.set_font_scale(s.font_scale)
+        self.scheduler.set_interval(self.tasbih.name, s.interval_ms)
+        self.scheduler.set_enabled(self.tasbih.name, s.tasbih_reminder_enabled)
+        self.tray.set_sound_checked(s.reminder_sound_enabled)
+        if self.window is not None:
+            self.window.apply_appearance()
 
     def remind_now(self) -> None:
         self.tasbih.run()
@@ -131,7 +167,8 @@ def main() -> int:
         QMessageBox.critical(None, APP_DISPLAY_NAME, "شريط النظام (System Tray) غير متوفر.")
         return 1
 
-    app._azkar = AzkarApp(app)  # type: ignore[attr-defined]  # keep a strong ref
+    started_at_login = STARTUP_FLAG in sys.argv[1:]
+    app._azkar = AzkarApp(app, startup=started_at_login)  # type: ignore[attr-defined]
     return app.exec()
 
 
