@@ -12,9 +12,12 @@ from PySide6.QtCore import QSharedMemory, QTimer
 from PySide6.QtWidgets import QApplication, QDialog, QMessageBox, QSystemTrayIcon
 
 from . import APP_DISPLAY_NAME, APP_ID, APP_NAME, autostart
+from . import hijri as hijri_mod
 from .autostart import STARTUP_FLAG
+from .clock_scheduler import ClockScheduler, parse_hhmm
 from .config import load_settings, save_settings
 from .notifier import Notifier
+from .sound import play_knock
 from .paths import icon_png_path
 from .reminders.startup_dialog import show_startup_dialog
 from .reminders.tasbih_toast import TasbihToastReminder
@@ -73,6 +76,16 @@ class AzkarApp:
             enabled=self.settings.tasbih_reminder_enabled,
         )
 
+        # Time-of-day reminders: morning/evening azkar, Thursday-evening salawat.
+        self.clock = ClockScheduler()
+        self._register_timed_reminders()
+
+        # Hijri date: show immediately (local), then adjust online ~monthly.
+        self._hijri_text = hijri_mod.format_hijri(self.settings.hijri_adjustment)
+        self.hijri_sync = hijri_mod.HijriSync(self.settings, save_settings)
+        self.hijri_sync.updated.connect(self._on_hijri_updated)
+        self.hijri_sync.maybe_sync()
+
         # Honour the saved "run at login" preference.
         autostart.sync(self.settings.run_at_login)
 
@@ -84,10 +97,49 @@ class AzkarApp:
             # Launched manually (double-click): open the main window, no dialog.
             self.open_window()
 
+    # --- scheduled reminders & hijri --------------------------------------
+    def _register_timed_reminders(self) -> None:
+        s = self.settings
+        mh, mm = parse_hhmm(s.morning_azkar_reminder_time, (4, 50))
+        self.clock.add_daily(
+            "morning", mh, mm,
+            lambda: self._notify("أذكار الصباح", "حان وقت أذكار الصباح"),
+            enabled=s.morning_azkar_reminder_enabled,
+        )
+        eh, em = parse_hhmm(s.evening_azkar_reminder_time, (16, 0))
+        self.clock.add_daily(
+            "evening", eh, em,
+            lambda: self._notify("أذكار المساء", "حان وقت أذكار المساء"),
+            enabled=s.evening_azkar_reminder_enabled,
+        )
+        fh, fm = parse_hhmm(s.friday_salawat_time, (18, 0))
+        self.clock.add_daily(
+            "friday_salawat", fh, fm,
+            lambda: self._notify(
+                "ليلة الجمعة",
+                "لا تنس الإكثار من الصلاة على النبي صلى الله عليه وسلم ليلة الجمعة ويومها",
+            ),
+            weekday=3,  # Thursday (Mon=0 .. Sun=6)
+            enabled=s.friday_salawat_enabled,
+        )
+
+    def _notify(self, title: str, body: str) -> None:
+        sound = self.settings.reminder_sound_enabled
+        if sound:
+            play_knock()
+        self.notifier.notify(title, body, silent=sound)
+
+    def _on_hijri_updated(self) -> None:
+        self._hijri_text = hijri_mod.format_hijri(self.settings.hijri_adjustment)
+        if self.window is not None:
+            self.window.set_hijri(self._hijri_text)
+
     # --- tray callbacks ---------------------------------------------------
     def open_window(self) -> None:
         if self.window is None:
-            self.window = MainWindow(self.icon, on_settings=self.open_settings)
+            self.window = MainWindow(
+                self.icon, on_settings=self.open_settings, hijri_text=self._hijri_text
+            )
         self.window.reveal()
 
     def open_settings(self) -> None:

@@ -29,6 +29,8 @@ try {
         "--name", "Azkar",
         "--paths", "src",
         "--hidden-import", "windows_toasts",
+        "--hidden-import", "hijridate",
+        "--collect-submodules", "hijridate",
         "--add-data", "src/azkar/content/data;azkar/content/data",
         "--add-data", "assets;assets"
     )

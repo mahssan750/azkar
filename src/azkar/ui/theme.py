@@ -27,7 +27,7 @@ LIGHT = {
     "input_bg": "#f4f6f5", "input_border": "#dfe6e2", "input_text": "#1d2b25",
     "footer_bg": "#e3ece8", "footer_text": "#155c43", "footer_border": "#d3ded8",
     "scroll_handle": "#c3d2cb",
-    "empty_text": "#8a9994", "info": "#1f7a5a",
+    "empty_text": "#8a9994", "info": "#1f7a5a", "hijri": "#fbe7bd",
 }
 
 DARK = {
@@ -47,7 +47,7 @@ DARK = {
     "input_bg": "#20302a", "input_border": "#34433b", "input_text": "#e7efea",
     "footer_bg": "#16221d", "footer_text": "#9fcdb8", "footer_border": "#243029",
     "scroll_handle": "#34433b",
-    "empty_text": "#7d8c85", "info": "#2faa78",
+    "empty_text": "#7d8c85", "info": "#2faa78", "hijri": "#f1d493",
 }
 
 
@@ -119,7 +119,12 @@ QPushButton#addButton { background: $accent; color: #ffffff; border: none; borde
 QPushButton#addButton:hover   { background: $accent_hover; }
 QPushButton#addButton:pressed { background: $accent_press; }
 
-QLabel#footer { color: $footer_text; background: $footer_bg; border-top: 1px solid $footer_border; padding: 10px; }
+QLabel#headerSubtitle { color: $header_sub; }
+QLabel#hijriDate { color: $hijri; }
+QFrame#footer { background: $footer_bg; border-top: 1px solid $footer_border; }
+QLabel#footerDua { color: $footer_text; }
+QPushButton#contactBtn { background: transparent; color: $footer_text; border: none; }
+QPushButton#contactBtn:hover { color: $accent; text-decoration: underline; }
 
 QScrollBar:vertical { background: transparent; width: 10px; margin: 4px; }
 QScrollBar::handle:vertical { background: $scroll_handle; border-radius: 5px; min-height: 30px; }

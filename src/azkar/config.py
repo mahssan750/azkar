@@ -29,6 +29,18 @@ class Settings:
     theme: str = "light"          # "light" or "dark"
     font_scale: float = 1.0       # 0.7 .. 1.6
 
+    # time-of-day reminders (HH:MM, 24-hour)
+    morning_azkar_reminder_enabled: bool = True
+    morning_azkar_reminder_time: str = "04:50"
+    evening_azkar_reminder_enabled: bool = True
+    evening_azkar_reminder_time: str = "16:00"
+    friday_salawat_enabled: bool = True
+    friday_salawat_time: str = "18:00"   # Thursday evening (ليلة الجمعة)
+
+    # hijri calendar (adjustment in days, synced online ~monthly)
+    hijri_adjustment: int = 0
+    hijri_last_sync: str = ""            # ISO date of last successful sync
+
     # The 10-minute reminder text. By default it is the fixed phrase above.
     tasbih_text: str = DEFAULT_TASBIH_TEXT
     # When True, the reminder rotates through content/data/tasbih.json instead

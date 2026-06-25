@@ -14,7 +14,12 @@ computer.
   - **الأربعون النووية** — the 40 (42) hadith of an-Nawawi, each with an
     expandable explanation.
   - **أذكاري** — add and keep your own azkar.
-- A du'a footer on every tab: *لا تنسونا من صالح دعائكم*.
+  - The **Hijri date** is shown in the header (computed offline, fine-tuned
+    online about once a month).
+- **Daily azkar reminders**: morning azkar at 04:50 and evening azkar at 16:00.
+- **Thursday evening** (ليلة الجمعة): a reminder to send salawat upon the Prophet ﷺ.
+- A footer on every tab: a du'a (*لا تنسونا من صالح دعائكم*) and a **تواصل معنا**
+  link that opens an email to the author.
 
 It runs quietly in the system tray and is built to grow — content lives in
 JSON files under `content/data/`, so adding more is data, not code.
@@ -78,6 +83,11 @@ Everything is also stored in `%APPDATA%\Azkar\config.json` (created on first run
 | `run_at_login` | `true` | Launch automatically at sign-in |
 | `theme` | `"light"` | `"light"` or `"dark"` |
 | `font_scale` | `1.0` | UI font scale (0.7–1.6) |
+| `morning_azkar_reminder_time` | `"04:50"` | Daily morning-azkar reminder (HH:MM) |
+| `evening_azkar_reminder_time` | `"16:00"` | Daily evening-azkar reminder (HH:MM) |
+| `friday_salawat_time` | `"18:00"` | Thursday-evening salawat reminder (HH:MM) |
+| `morning_azkar_reminder_enabled` / `evening_…` / `friday_salawat_enabled` | `true` | Enable each scheduled reminder |
+| `hijri_adjustment` | `0` | Day offset for the Hijri date (auto-synced) |
 | `tasbih_text` | `"قل سبحان الله والحمد لله"` | The toast text |
 | `tasbih_shuffle` | `false` | Rotate phrases from `tasbih.json` instead |
 | `debug_interval_seconds` | `0` | If > 0, overrides the interval (for testing) |
