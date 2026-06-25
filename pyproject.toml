@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "azkar"
+version = "0.1.0"
+description = "Windows reminder app to remember Allah during computer use (azkar / tasbih)."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "PySide6>=6.6",
+    "windows-toasts>=1.1",
+]
+
+[project.optional-dependencies]
+dev = ["pyinstaller>=6.0", "pytest>=7.0"]
+
+# Windowed entry (no console) — used for autostart and normal launch.
+[project.gui-scripts]
+azkar = "azkar.app:main"
+
+# Console entry — shows tracebacks; handy while developing.
+[project.scripts]
+azkar-debug = "azkar.app:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+azkar = ["content/data/*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
